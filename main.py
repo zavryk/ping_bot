@@ -1,5 +1,6 @@
 import telebot
 import os
+import logging
 from re import findall
 from subprocess import Popen, PIPE
 
@@ -22,12 +23,13 @@ def ping(host, ping_count) -> str:
 nodes = os.getenv("NODE")
 
 # nodes = ["127.0.0.1"]
-#result = ping(nodes, 3)
-#print(result)
+# result = ping(nodes, 3)
+# print(result)
 
 token = os.getenv("ACCESS_TOKEN")
 bot = telebot.TeleBot(token)
-
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 @bot.message_handler(commands=['start', 'help'])
 def send_text(message):
@@ -36,6 +38,7 @@ def send_text(message):
         bot.send_message(message.chat.id, 'Федір віддихає \U0001F937')
     else:
         bot.send_message(message.chat.id, 'Федір работає \U0001F477')
+
 
 
 if __name__ == '__main__':
