@@ -20,13 +20,13 @@ def ping(host, ping_count) -> str:
             return "DOWN"
 
 
-nodes = os.getenv("NODE")
+nodes = os.getenv('NODE')
 
 # nodes = ["127.0.0.1"]
 # result = ping(nodes, 3)
 # print(result)
 
-token = os.getenv("ACCESS_TOKEN")
+token = os.getenv('ACCESS_TOKEN')
 bot = telebot.TeleBot(token)
 # Configure logging
 logging.basicConfig(level=logging.INFO)
