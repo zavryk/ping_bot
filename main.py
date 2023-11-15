@@ -17,11 +17,11 @@ def ping(host, ping_count) -> str:
         else:
             return "DOWN"
 
-#nodes = os.getenv('NODE')
-nodes = '176.37.237.129'
+nodes = os.getenv('NODE')
 
-#token = os.getenv('ACCESS_TOKEN')
-token = '6946352428:AAG7OBrEZZs9QT0R3IXtVEqkd-BhJjmqHqk'
+
+token = os.getenv('ACCESS_TOKEN')
+
 
 bot = telebot.TeleBot(token)
 
