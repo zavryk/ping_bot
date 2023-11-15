@@ -17,15 +17,15 @@ def ping(host, ping_count) -> str:
         else:
             return "DOWN"
 
-nodes = os.getenv('NODE')
 
+nodes = os.getenv("NODE")
 
-token = os.getenv('ACCESS_TOKEN')
-
+token = os.getenv("ACCESS_TOKEN")
 
 bot = telebot.TeleBot(token)
 
 logging.basicConfig(level=logging.INFO)
+
 
 @app.route('/' + token, methods=['POST'])
 def getMessage():
