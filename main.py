@@ -3,6 +3,7 @@ import os
 import asyncio
 import datetime
 import httpx
+import socket
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -22,6 +23,17 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 print(MONITORED_IP)
+
+def ping(host, port, timeout=10):
+    try:
+        socket.create_connection((host, port), timeout=timeout)
+        return True
+    except (socket.timeout, socket.error):
+        return False
+
+# Example
+result = ping(MONITORED_IP,53131)
+print("Host is reachable" if result else "Host is not reachable")
 
 
 # timeout = 5
