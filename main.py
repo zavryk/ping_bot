@@ -79,8 +79,6 @@ async def notify_status_change(message):
 
 @dp.message_handler(commands=['status'])
 async def check_current_status(message: types.Message):
-    @dp.message_handler(commands=['status'])
-    async def notify_status_change(message: types.Message):
         current_status = await check_ip(MONITORED_IP, 53131)
         is_up = bool(current_status)
         status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
