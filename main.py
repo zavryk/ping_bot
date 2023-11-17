@@ -4,7 +4,7 @@ import asyncio
 import socket
 import random
 
-from aiogram import Bot
+from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.types import ParseMode
 from aiogram.utils import executor
@@ -76,6 +76,16 @@ async def notify_status_change(status: int):
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
     await bot.send_message(chat_id=YOUR_CHAT_ID, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
 
+    @dp.message_handler(commands=['status'])
+    async def check_current_status(message: types.Message):
+        current_status = await check_ip(MONITORED_IP, 53131)
+        is_up = bool(current_status)
+        status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
+        await bot.send_message(chat_id=message.chat.id, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
+
+    @dp.message_handler(lambda message: message.text == 'А щас?')
+    async def call_status_command(message: types.Message):
+        await check_current_status(message)
 
 if __name__ == '__main__':
     try:
