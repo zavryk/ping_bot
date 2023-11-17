@@ -49,14 +49,11 @@ async def check_ip(ip):
     timeout = 10
     start = datetime.datetime.now()
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(f"http://{ip}", timeout=20)
-            return response.status_code == 200
+        socket.create_connection((MONITORED_IP, 53131), timeout=timeout)
+        return True
+    except (socket.timeout, socket.error):
+        return False
 
-        #await asyncio.sleep(5)
-    except Exception as e:
-        logging.error(f"Error while checking IP {ip}: {e}")
-    return False
 
 
 async def monitor_ip():
