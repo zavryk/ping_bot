@@ -32,17 +32,18 @@ print(MONITORED_IP)
 #             break
 # print(otvet)
 
-
-
 async def check_ip(ip):
     timeout = 10
     start = datetime.datetime.now()
-    while (datetime.datetime.now() - start).total_seconds() < timeout:
-        res = ping(ip, timeout=timeout, ttl=20)
-        if res:
-            return True
-        # Wait for 5 seconds before the next check
-        await asyncio.sleep(5)
+    try:
+        while (datetime.datetime.now() - start).total_seconds() < timeout:
+            res = ping(ip, timeout=timeout, ttl=20)
+            if res:
+                return True
+            # Wait for 5 seconds before the next check
+            await asyncio.sleep(5)
+    except Exception as e:
+        logging.error(f"Error while checking IP {ip}: {e}")
     return False
 
 
