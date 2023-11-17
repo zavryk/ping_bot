@@ -11,9 +11,10 @@ from aiogram.types import ParseMode, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils import executor
 from ping3 import ping
 
-API_TOKEN = os.getenv('ACCESS_TOKEN')
-MONITORED_IP = os.getenv('NODE')
-YOUR_CHAT_ID = os.getenv('YOUR_CHAT_ID')
+API_TOKEN = "6946352428:AAG7OBrEZZs9QT0R3IXtVEqkd-BhJjmqHqk"
+MONITORED_IP = "host-176-37-237-129.b025.la.net.ua"
+YOUR_CHAT_ID = "-4048700533"
+
 
 
 
@@ -49,10 +50,10 @@ async def check_ip(ip):
     timeout = 10
 
     try:
-        socket.create_connection((MONITORED_IP, 53131), timeout=timeout)
+        ping(MONITORED_IP, 53131)
         return True
-    except Exception as e:
-        logging.error(f"Error while checking IP {ip}: {socket.error}")
+    except socket.error as e:
+        logging.error(f"Error while checking IP {ip}: {e}")
 
         return False
 
