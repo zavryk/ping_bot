@@ -27,8 +27,8 @@ response_down = [
 ]
 
 response_up = [
-    "🟩 Добрий день! 🧑‍💻",
-    "🟩 Прийшов оце рано, шоб до 1 вересня кончить 🌱",
+    "🟩 Добрий день! 🖖",
+    "🟩 Прийшов оце рано, шоб до 1 вересня кончить ❄",
     "🟩 Зайшов спитать, чи же придумали, шо на фартух вішать? 🐼",
     "🟩 А де всі? 🤔",
     "🟩 На мєстє! 👌",
@@ -73,7 +73,7 @@ async def monitor_ip():
 @dp.message_handler(commands=['start'])
 async def notify_status_change(status: int):
     is_up = bool(status)  # Convert to boolean
-    status_message = random.sample(response_up, 1) if is_up else random.sample(response_down, 1)
+    status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
     await bot.send_message(chat_id=YOUR_CHAT_ID, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
 
 
