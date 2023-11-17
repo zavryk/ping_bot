@@ -73,9 +73,8 @@ async def monitor_ip():
 @dp.message_handler(commands=['start'])
 async def notify_status_change(status: int):
     is_up = bool(status)  # Convert to boolean
-    #status_message = f"IP {MONITORED_IP} {'доступний' if is_up else 'недоступний'}"
     status_message = random.sample(response_up, 1) if is_up else random.sample(response_down, 1)
-    await bot.send_message(chat_id=YOUR_CHAT_ID, text=status_message, parse_mode=ParseMode.MARKDOWN)
+    await bot.send_message(chat_id=YOUR_CHAT_ID, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
 
 
 if __name__ == '__main__':
