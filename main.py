@@ -6,7 +6,7 @@ import random
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
-from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils import executor
 
 API_TOKEN = os.getenv('ACCESS_TOKEN')
@@ -101,8 +101,10 @@ async def inline_status_query(inline_query: types.InlineQuery):
 
     result_id = f"{random.randint(1, 999)}_{is_up}"
     result = types.InlineQueryResultArticle(id=result_id, title="Статус", input_message_content=types.InputTextMessageContent(status_message), reply_markup=keyboard)
-    await bot.answer_inline_query(inline_query.id, results=[result], cache_time=0)
-
+    try:
+        await bot.answer_inline_query(inline_query.id, results=[result], cache_time=0)
+    except Exception as e:
+        logging.error(f"An error occurred while answering inline query: {e}")
 
 if __name__ == '__main__':
     try:
