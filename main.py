@@ -57,28 +57,16 @@ async def monitor_ip():
         # Wait for 30 seconds before the next check
         await asyncio.sleep(60)
 
+
 @dp.message_handler(commands=['start'])
-async def notify_status_change(is_up):
+async def notify_status_change(is_up: bool):
     status_message = f"IP {MONITORED_IP} {'доступний' if is_up else 'недоступний'}"
     await bot.send_message(chat_id=YOUR_CHAT_ID, text=status_message, parse_mode=ParseMode.MARKDOWN)
 
-
-# @dp.message_handler(commands=['check_status'])
-# async def check_status(message: types.Message):
-#     current_status = await check_ip(MONITORED_IP)
-#     await notify_status_change(current_status)
-
-
-#@dp.message_handler(commands=['start'])
-#async def start(message: types.Message):
- #   keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
- #   button_check_status = KeyboardButton('Перевірити статус')
- #   keyboard.add(button_check_status)
-
-   # await message.answer("Вітаю! Я готовий моніторити статус IP-адреси.", reply_markup=keyboard)
-
-
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.create_task(monitor_ip())
-    executor.start_polling(dp, loop=loop, skip_updates=True)
+    try:
+        loop = asyncio.get_event_loop()
+        loop.create_task(monitor_ip())
+        executor.start_polling(dp, loop=loop, skip_updates=True)
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
