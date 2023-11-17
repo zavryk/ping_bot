@@ -70,11 +70,19 @@ async def monitor_ip():
         await asyncio.sleep(120)
 
 
-@dp.message_handler(commands=['start'])
-async def notify_status_change(message):
-    is_up = bool(int(message.get_args()))
+# @dp.message_handler(commands=['start'])
+# async def notify_status_change(message):
+#     is_up = bool(int(message.get_args()))
+#     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
+#     await bot.send_message(chat_id=message.chat.id, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
+@dp.message_handler(commands=['status'])
+async def notify_status_change(message: types.Message):
+    current_status = await check_ip(MONITORED_IP, 53131)
+    is_up = bool(current_status)
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
-    await bot.send_message(chat_id=message.chat.id, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
+
+    await bot.send_message(chat_id=message.chat.id, text=status_message, parse_mode=ParseMode.MARKDOWN)
+
 
 
 @dp.message_handler(commands=['status'])
