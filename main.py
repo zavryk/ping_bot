@@ -2,6 +2,7 @@ import logging
 import os
 import asyncio
 import datetime
+import httpx
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -36,12 +37,11 @@ async def check_ip(ip):
     timeout = 10
     start = datetime.datetime.now()
     try:
-        while (datetime.datetime.now() - start).total_seconds() < timeout:
-            res = ping(ip, timeout=timeout, ttl=20)
-            if res:
-                return True
-            # Wait for 5 seconds before the next check
-            await asyncio.sleep(5)
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"http://{ip}", timeout=20)
+            return response.status_code == 200
+
+        #await asyncio.sleep(5)
     except Exception as e:
         logging.error(f"Error while checking IP {ip}: {e}")
     return False
