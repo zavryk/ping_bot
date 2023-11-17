@@ -51,8 +51,12 @@ async def check_ip(ip):
     try:
         socket.create_connection((MONITORED_IP, 53131), timeout=timeout)
         return True
-    except (socket.timeout, socket.error):
+    except Exception as e:
+        logging.error(f"Error while checking IP {ip}: {socket.error}")
+
         return False
+
+
 
 
 
