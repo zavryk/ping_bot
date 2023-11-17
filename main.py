@@ -33,7 +33,7 @@ def ping(host, port, timeout=10):
 
 # Example
 result = ping(MONITORED_IP,53131)
-print("Host is reachable" if result else "Host is not reachable")
+print(result)
 
 
 # timeout = 5
