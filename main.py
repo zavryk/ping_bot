@@ -44,7 +44,7 @@ async def monitor_ip():
             await notify_status_change(int(current_status))
             prev_status = current_status
         # Wait for 60 seconds before the next check
-        await asyncio.sleep(5)
+        await asyncio.sleep(120)
 
 
 @dp.message_handler(commands=['start'])
