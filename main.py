@@ -23,18 +23,15 @@ dp = Dispatcher(bot)
 print(MONITORED_IP)
 
 
-timeout = 5
-start = datetime.datetime.now()
-while (datetime.datetime.now() - start).total_seconds() < timeout:
-    otvet = ping(MONITORED_IP, timeout=timeout, ttl=20)
-    if otvet: # завершаем в случае успеха
+# timeout = 5
+# start = datetime.datetime.now()
+# while (datetime.datetime.now() - start).total_seconds() < timeout:
+#     otvet = ping(MONITORED_IP, timeout=timeout, ttl=20)
+#     if otvet: # завершаем в случае успеха
+#
+#             break
+# print(otvet)
 
-            break
-print(otvet)
-
-# for _ in range(5):
-#     otvet = ping('10.200.231.203', timeout=20, ttl=20)
-#     if not (otvet == False): # завершаем если успех или таймаут
 
 
 async def check_ip(ip):
@@ -57,7 +54,7 @@ async def monitor_ip():
             await notify_status_change(current_status)
             prev_status = current_status
         # Wait for 30 seconds before the next check
-        await asyncio.sleep(30)
+        await asyncio.sleep(60)
 
 @dp.message_handler(commands=['start'])
 async def notify_status_change(is_up):
