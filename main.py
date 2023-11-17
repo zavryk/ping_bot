@@ -23,7 +23,8 @@ dp = Dispatcher(bot)
 async def check_ip(ip):
     for _ in range(3):
         try:
-            result = subprocess.run(["ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #result = subprocess.run(["ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.run(["/bin/ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if result.returncode == 0:
                 return True
         except Exception as e:
