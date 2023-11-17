@@ -6,12 +6,10 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.types import ParseMode, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils import executor
-import subprocess
-
+from ping3 import ping
 
 API_TOKEN = os.getenv('ACCESS_TOKEN')
 MONITORED_IP = os.getenv('NODE')
-
 YOUR_CHAT_ID = os.getenv('YOUR_CHAT_ID')
 
 logging.basicConfig(level=logging.INFO)
@@ -23,9 +21,7 @@ dp = Dispatcher(bot)
 async def check_ip(ip):
     for _ in range(3):
         try:
-            #result = subprocess.run(["ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            result = subprocess.run(["/bin/ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if result.returncode == 0:
+            if ping(ip, timeout=1) is not None:
                 return True
         except Exception as e:
             logging.error(f"Помилка при перевірці IP {ip}: {e}")
