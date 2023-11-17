@@ -79,11 +79,17 @@ async def notify_status_change(message):
 
 @dp.message_handler(commands=['status'])
 async def check_current_status(message: types.Message):
-    current_status = await check_ip(MONITORED_IP, 53131)
-    is_up = bool(current_status)
-    status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
-    await bot.send_message(chat_id=message.chat.id, text=str(status_message), parse_mode=ParseMode.MARKDOWN)
+    @dp.message_handler(commands=['status'])
+    async def notify_status_change(message: types.Message):
+        current_status = await check_ip(MONITORED_IP, 53131)
+        is_up = bool(current_status)
+        status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
 
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(types.KeyboardButton(text='А щас?'))
+
+        await bot.send_message(chat_id=message.chat.id, text=status_message, parse_mode=ParseMode.MARKDOWN,
+                               reply_markup=keyboard)
 
 @dp.message_handler(lambda message: message.text == 'А щас?')
 async def call_status_command(message: types.Message):
