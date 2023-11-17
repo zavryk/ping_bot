@@ -47,7 +47,7 @@ print(result)
 
 async def check_ip(ip):
     timeout = 10
-    start = datetime.datetime.now()
+
     try:
         socket.create_connection((MONITORED_IP, 53131), timeout=timeout)
         return True
