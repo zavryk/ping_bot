@@ -15,7 +15,7 @@ YOUR_CHAT_ID = os.getenv('YOUR_CHAT_ID')
 
 response_down = [
     "🔴 Наробився 🐧",
-    "🔴 Работа нє волк, подождемо до завтра 🌌",
+    "🔴 Работа нє волк 🐺",
     "🔴 Я шо, коняка? 🐎",
     "🔴 На сьогодні хватить 🧘",
     "🔴 Хай поки сохне там 💆",
@@ -28,7 +28,7 @@ response_down = [
 response_up = [
     "🟩 Добрий день! 🖖",
     "🟩 Прийшов рано, щоб до 1 вересня кончить 🥹",
-    "🟩 Зайшов взнать, чи вже придумали, що на фартух вішати? 🐼",
+    "🟩 Зайшов взнать, чи вже придумали, що на фартух вішать? 🐼",
     "🟩 А де всі? 🤔",
     "🟩 Сьогодні 40 квадратів здєлаю, а може й усі 50 🥸",
     "🟩 На місці! 👌",
@@ -75,7 +75,7 @@ async def check_current_status(message: types.Message = None, force: bool = Fals
     if not force and chat_id in sent_messages:
         return
 
-    await bot.send_message(chat_id=chat_id, text="Бот запускається...", parse_mode=ParseMode.MARKDOWN)
+    await bot.send_message(chat_id=chat_id, text="🤖 Бот запускається...", parse_mode=ParseMode.MARKDOWN)
     status_message = await check_ip_status(chat_id)
     sent_messages[chat_id] = status_message  # Update the previous status
 
@@ -84,6 +84,10 @@ async def check_ip_status(chat_id):
     current_status = await check_ip(MONITORED_IP, 53131)
     is_up = bool(current_status)
     status_message = random.choice(response_up) if is_up else random.choice(response_down)
+
+    # Log the result of the status check
+    status_result = "UP" if is_up else "DOWN"
+    logging.info(f"IP {MONITORED_IP} status: {status_result}")
 
     # Логуємо повідомлення
     logging.info(f"Sent message to chat {chat_id}: {status_message}")
@@ -103,7 +107,7 @@ async def schedule_ip_status_check():
             await check_current_status(force=True)
             previous_status = is_up
 
-        await asyncio.sleep(30)  # Check every 120 seconds
+        await asyncio.sleep(30)  # Check every 30 seconds
 
 
 @dp.message_handler(commands=['status'])
