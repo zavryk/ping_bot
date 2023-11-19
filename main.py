@@ -15,22 +15,24 @@ YOUR_CHAT_ID = os.getenv('YOUR_CHAT_ID')
 
 response_down = [
     "🔴 Наробився 🐧",
-    "🔴 Робота ні волк, подождемо до завтра 🌌",
-    "🔴 Якщо я коняка? 🐎",
-    "🔴 На сьогодні вже хватить 🧘",
+    "🔴 Работа нє волк, подождемо до завтра 🌌",
+    "🔴 Я шо, коняка? 🐎",
+    "🔴 На сьогодні хватить 🧘",
     "🔴 Хай поки сохне там 💆",
-    "🔴 Світ вимкнув, воду вимкнув, до завтра 🙋‍♂️",
-    "🔴 Пішов просити сестру, щоб допомогла з маляркою 👫",
+    "🔴 Сьогодні 40 квадратів не получилось 🤔",
+    "🔴 Свєт вимкнув, воду вимкнув, до завтра 🙋‍♂️",
+    "🔴 Пішов просить сестру, щоб помогла з маляркою 👫",
     "🔴 Пішов, бо й метро закриється 🌒"
 ]
 
 response_up = [
     "🟩 Добрий день! 🖖",
-    "🟩 Прийшов рано, щоб до 1 вересня закінчити ❄",
-    "🟩 Зайшов дізнатися, чи вже придумали, що на фартух вішати? 🐼",
+    "🟩 Прийшов рано, щоб до 1 вересня кончить 🥹",
+    "🟩 Зайшов взнать, чи вже придумали, що на фартух вішати? 🐼",
     "🟩 А де всі? 🤔",
+    "🟩 Сьогодні 40 квадратів здєлаю, а може й усі 50 🥸",
     "🟩 На місці! 👌",
-    "🟩 Сьогодні буду працювати до ночі 💪"
+    "🟩 Сьогодні буду работать до ночі 💪"
 ]
 
 logging.basicConfig(level=logging.DEBUG)
@@ -39,7 +41,7 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 # Set to keep track of sent messages
-sent_messages = set()
+sent_messages = {}
 
 
 async def check_ip(port, timeout=10):
@@ -48,7 +50,6 @@ async def check_ip(port, timeout=10):
         return True
     except (socket.timeout, socket.error):
         return False
-
 
 result = check_ip(MONITORED_IP, 53131)
 print(result)
@@ -75,25 +76,34 @@ async def check_current_status(message: types.Message = None, force: bool = Fals
         return
 
     await bot.send_message(chat_id=chat_id, text="Бот запускається...", parse_mode=ParseMode.MARKDOWN)
-    await check_ip_status(chat_id)
-    sent_messages.add(chat_id)  # Add the chat_id to the set of sent messages
+    status_message = await check_ip_status(chat_id)
+    sent_messages[chat_id] = status_message  # Update the previous status
 
 
 async def check_ip_status(chat_id):
     current_status = await check_ip(MONITORED_IP, 53131)
     is_up = bool(current_status)
-    status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
+    status_message = random.choice(response_up) if is_up else random.choice(response_down)
 
     # Логуємо повідомлення
     logging.info(f"Sent message to chat {chat_id}: {status_message}")
     await bot.send_message(chat_id=chat_id, text=status_message, parse_mode=ParseMode.MARKDOWN)
+    return status_message
 
 
 async def schedule_ip_status_check():
+    previous_status = None
+
     while True:
-        await check_current_status(force=True)
-        await asyncio.sleep(120)  # Check every 120 seconds
-        sent_messages.clear()  # Clear the set of sent messages after each iteration
+        current_status = await check_ip(MONITORED_IP, 53131)
+        is_up = bool(current_status)
+
+        if previous_status is None or is_up != previous_status:
+            # If the status changes, or it's the first check, send the status message
+            await check_current_status(force=True)
+            previous_status = is_up
+
+        await asyncio.sleep(30)  # Check every 120 seconds
 
 
 @dp.message_handler(commands=['status'])
@@ -110,7 +120,7 @@ async def call_status_command(message: types.Message):
 async def inline_status_query(inline_query: types.InlineQuery):
     current_status = await check_ip(MONITORED_IP, 53131)
     is_up = bool(current_status)
-    status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
+    status_message = random.choice(response_up) if is_up else random.choice(response_down)
 
     inline_result_id = f"{random.randint(1, 999)}_{is_up}"
     inline_result = types.InlineQueryResultArticle(
@@ -122,7 +132,6 @@ async def inline_status_query(inline_query: types.InlineQuery):
         await bot.answer_inline_query(inline_query.id, results=[inline_result], cache_time=0)
     except Exception as inner_exception:
         logging.error(f"An error occurred while answering inline query: {inner_exception}")
-
 
 if __name__ == '__main__':
     try:
