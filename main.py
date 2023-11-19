@@ -75,7 +75,6 @@ async def check_current_status(message: types.Message = None, force: bool = Fals
         return
 
     await bot.send_message(chat_id=chat_id, text="Бот запускається...", parse_mode=ParseMode.MARKDOWN)
-    await asyncio.sleep(120)  # Затримка для визначення статусу IP
     await check_ip_status(chat_id)
     sent_messages.add(chat_id)  # Add the chat_id to the set of sent messages
 
