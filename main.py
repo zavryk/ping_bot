@@ -39,7 +39,7 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
-def ping(host, port, timeout=10):
+async def check_ip(port, timeout=10):
     try:
         socket.create_connection((MONITORED_IP, port), timeout=timeout)
         return True
@@ -47,13 +47,11 @@ def ping(host, port, timeout=10):
         return False
 
 
-result = ping(MONITORED_IP, 53131)
+result = check_ip(MONITORED_IP, 53131)
 print(result)
 
 
-async def on_startup(dp):
-    await bot.send_message(chat_id=YOUR_CHAT_ID, text="Bot is starting...", parse_mode=ParseMode.MARKDOWN)
-    await asyncio.sleep(5)  # Затримка для визначення статусу IP
+async def on_startup(_):
     await check_current_status()
 
 
@@ -65,13 +63,14 @@ async def check_ip(host, port, timeout=10):
         return False
 
 
-async def check_current_status():
-    # Add code to check and send the current status as you did before
-    pass
-
-
-@dp.message_handler(commands=['status'])
 async def check_current_status(message: types.Message = None):
+    chat_id = message.chat.id if message and message.chat else YOUR_CHAT_ID
+    await bot.send_message(chat_id=chat_id, text="Bot is starting...", parse_mode=ParseMode.MARKDOWN)
+    await asyncio.sleep(5)  # Затримка для визначення статусу IP
+    await check_ip_status(chat_id)
+
+
+async def check_ip_status(chat_id):
     current_status = await check_ip(MONITORED_IP, 53131)
     is_up = bool(current_status)
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
@@ -80,9 +79,14 @@ async def check_current_status(message: types.Message = None):
     keyboard.add(types.KeyboardButton(text='А щас?'))
 
     # Логуємо повідомлення
-    logging.info(f"Sent message to chat {message.chat.id}: {status_message}")
-    await bot.send_message(chat_id=message.chat.id, text=status_message, parse_mode=ParseMode.MARKDOWN,
+    logging.info(f"Sent message to chat {chat_id}: {status_message}")
+    await bot.send_message(chat_id=chat_id, text=status_message, parse_mode=ParseMode.MARKDOWN,
                            reply_markup=keyboard)
+
+
+@dp.message_handler(commands=['status'])
+async def check_current_status_command(message: types.Message = None):
+    await check_current_status(message)
 
 
 @dp.message_handler(lambda message: message.text == 'А щас?')
@@ -96,19 +100,28 @@ async def inline_status_query(inline_query: types.InlineQuery):
     is_up = bool(current_status)
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
 
-    keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton(text='А щас?', switch_inline_query_current_chat='status'))
-
-    result_id = f"{random.randint(1, 999)}_{is_up}"
-    result = types.InlineQueryResultArticle(id=result_id, title="Статус", input_message_content=types.InputTextMessageContent(status_message), reply_markup=keyboard)
+    keyboard = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            text='А щас?', switch_inline_query_current_chat='status'
+        )
+    )
+    inline_result_id = f"{random.randint(1, 999)}_{is_up}"
+    inline_result = types.InlineQueryResultArticle(
+        id=inline_result_id,
+        title="Статус",
+        input_message_content=types.InputTextMessageContent(status_message),
+        reply_markup=keyboard
+    )
     try:
-        await bot.answer_inline_query(inline_query.id, results=[result], cache_time=0)
-    except Exception as e:
-        logging.error(f"An error occurred while answering inline query: {e}")
+        await bot.answer_inline_query(inline_query.id, results=[inline_result], cache_time=0)
+    except Exception as inner_exception:
+        logging.error(f"An error occurred while answering inline query: {inner_exception}")
+
 
 if __name__ == '__main__':
     try:
         loop = asyncio.get_event_loop()
-        loop.create_task(check_current_status())  # Використовуємо check_current_status замість monitor_ip
+        loop.create_task(on_startup(None))
         executor.start_polling(dp, loop=loop, on_startup=on_startup, skip_updates=True)
     except Exception as e:
         logging.error(f"An error occurred: {e}")
