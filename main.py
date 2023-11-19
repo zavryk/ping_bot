@@ -6,7 +6,7 @@ import random
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
-from aiogram.types import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import ParseMode
 from aiogram.utils import executor
 
 API_TOKEN = os.getenv('ACCESS_TOKEN')
@@ -55,9 +55,8 @@ print(result)
 
 
 async def on_startup(_):
-    await check_current_status(force=True)
-    # Schedule the IP status check every 120 seconds
-    asyncio.create_task(schedule_ip_status_check())
+    # Removed check_current_status from on_startup
+    pass
 
 
 async def check_ip(host, port, timeout=10):
@@ -86,19 +85,15 @@ async def check_ip_status(chat_id):
     is_up = bool(current_status)
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
 
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(types.KeyboardButton(text='А щас?'))
-
     # Логуємо повідомлення
     logging.info(f"Sent message to chat {chat_id}: {status_message}")
-    await bot.send_message(chat_id=chat_id, text=status_message, parse_mode=ParseMode.MARKDOWN,
-                           reply_markup=keyboard)
+    await bot.send_message(chat_id=chat_id, text=status_message, parse_mode=ParseMode.MARKDOWN)
 
 
 async def schedule_ip_status_check():
     while True:
-        await asyncio.sleep(120)  # Wait for 120 seconds
-        await check_ip_status(YOUR_CHAT_ID)
+        await check_current_status(force=True)
+        await asyncio.sleep(120)  # Check every 120 seconds
 
 
 @dp.message_handler(commands=['status'])
@@ -117,17 +112,11 @@ async def inline_status_query(inline_query: types.InlineQuery):
     is_up = bool(current_status)
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
 
-    keyboard = InlineKeyboardMarkup().add(
-        InlineKeyboardButton(
-            text='А щас?', switch_inline_query_current_chat='status'
-        )
-    )
     inline_result_id = f"{random.randint(1, 999)}_{is_up}"
     inline_result = types.InlineQueryResultArticle(
         id=inline_result_id,
         title="Статус",
-        input_message_content=types.InputTextMessageContent(status_message),
-        reply_markup=keyboard
+        input_message_content=types.InputTextMessageContent(status_message)
     )
     try:
         await bot.answer_inline_query(inline_query.id, results=[inline_result], cache_time=0)
@@ -138,7 +127,7 @@ async def inline_status_query(inline_query: types.InlineQuery):
 if __name__ == '__main__':
     try:
         loop = asyncio.get_event_loop()
-        loop.create_task(on_startup(None))
+        loop.create_task(schedule_ip_status_check())
         executor.start_polling(dp, loop=loop, on_startup=on_startup, skip_updates=True)
     except Exception as e:
         logging.error(f"An error occurred: {e}")
