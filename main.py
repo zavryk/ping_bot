@@ -60,7 +60,7 @@ async def check_ip(host, port, timeout=10):
 
 
 @dp.message_handler(commands=['status'])
-async def check_current_status(message: types.Message):
+async def check_current_status(message: types.Message = None):
     current_status = await check_ip(MONITORED_IP, 53131)
     is_up = bool(current_status)
     status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
