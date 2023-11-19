@@ -51,6 +51,12 @@ result = ping(MONITORED_IP, 53131)
 print(result)
 
 
+async def on_startup(dp):
+    await bot.send_message(chat_id=YOUR_CHAT_ID, text="Bot is starting...", parse_mode=ParseMode.MARKDOWN)
+    await asyncio.sleep(5)  # Затримка для визначення статусу IP
+    await check_current_status()
+
+
 async def check_ip(host, port, timeout=10):
     try:
         socket.create_connection((host, port), timeout=timeout)
@@ -60,9 +66,8 @@ async def check_ip(host, port, timeout=10):
 
 
 async def check_current_status():
-    await bot.send_message(chat_id=YOUR_CHAT_ID, text="Bot is starting...", parse_mode=ParseMode.MARKDOWN)
-    await asyncio.sleep(5)  # Затримка для визначення статусу IP
-    await check_current_status()
+    # Add code to check and send the current status as you did before
+    pass
 
 
 @dp.message_handler(commands=['status'])
@@ -104,6 +109,6 @@ if __name__ == '__main__':
     try:
         loop = asyncio.get_event_loop()
         loop.create_task(check_current_status())  # Використовуємо check_current_status замість monitor_ip
-        executor.start_polling(dp, loop=loop, skip_updates=True)
+        executor.start_polling(dp, loop=loop, on_startup=on_startup, skip_updates=True)
     except Exception as e:
         logging.error(f"An error occurred: {e}")
