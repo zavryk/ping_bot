@@ -38,6 +38,9 @@ logging.basicConfig(level=logging.DEBUG)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+# Set to keep track of sent messages
+sent_messages = set()
+
 
 async def check_ip(port, timeout=10):
     try:
@@ -52,7 +55,7 @@ print(result)
 
 
 async def on_startup(_):
-    await check_current_status()
+    await check_current_status(force=True)
 
 
 async def check_ip(host, port, timeout=10):
@@ -63,11 +66,17 @@ async def check_ip(host, port, timeout=10):
         return False
 
 
-async def check_current_status(message: types.Message = None):
+async def check_current_status(message: types.Message = None, force: bool = False):
     chat_id = message.chat.id if message and message.chat else YOUR_CHAT_ID
+
+    # If force is False and the message has already been sent, return
+    if not force and chat_id in sent_messages:
+        return
+
     await bot.send_message(chat_id=chat_id, text="Bot is starting...", parse_mode=ParseMode.MARKDOWN)
     await asyncio.sleep(5)  # Затримка для визначення статусу IP
     await check_ip_status(chat_id)
+    sent_messages.add(chat_id)  # Add the chat_id to the set of sent messages
 
 
 async def check_ip_status(chat_id):
