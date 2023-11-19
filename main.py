@@ -59,6 +59,12 @@ async def check_ip(host, port, timeout=10):
         return False
 
 
+async def check_current_status():
+    await bot.send_message(chat_id=YOUR_CHAT_ID, text="Bot is starting...", parse_mode=ParseMode.MARKDOWN)
+    await asyncio.sleep(5)  # Затримка для визначення статусу IP
+    await check_current_status()
+
+
 @dp.message_handler(commands=['status'])
 async def check_current_status(message: types.Message = None):
     current_status = await check_ip(MONITORED_IP, 53131)
