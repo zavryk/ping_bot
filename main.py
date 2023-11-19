@@ -56,6 +56,8 @@ print(result)
 
 async def on_startup(_):
     await check_current_status(force=True)
+    # Schedule the IP status check every 120 seconds
+    asyncio.create_task(schedule_ip_status_check())
 
 
 async def check_ip(host, port, timeout=10):
@@ -91,6 +93,12 @@ async def check_ip_status(chat_id):
     logging.info(f"Sent message to chat {chat_id}: {status_message}")
     await bot.send_message(chat_id=chat_id, text=status_message, parse_mode=ParseMode.MARKDOWN,
                            reply_markup=keyboard)
+
+
+async def schedule_ip_status_check():
+    while True:
+        await asyncio.sleep(120)  # Wait for 120 seconds
+        await check_ip_status(YOUR_CHAT_ID)
 
 
 @dp.message_handler(commands=['status'])
