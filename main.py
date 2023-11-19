@@ -97,6 +97,7 @@ async def check_current_status(message: types.Message):
         await bot.send_message(chat_id=message.chat.id, text=status_message, parse_mode=ParseMode.MARKDOWN,
                                reply_markup=keyboard)
 
+
 @dp.message_handler(lambda message: message.text == 'А щас?')
 async def call_status_command(message: types.Message):
     await check_current_status(message)
