@@ -11,6 +11,7 @@ from aiogram.utils import executor
 
 API_TOKEN = os.getenv('ACCESS_TOKEN')
 MONITORED_IP = os.getenv('NODE')
+NODE_PORT = int(os.getenv('NODE_PORT', '53131'))  # Default to 53131 if NODE_PORT is not set
 YOUR_CHAT_ID = os.getenv('YOUR_CHAT_ID')
 
 response_down = [
@@ -51,7 +52,7 @@ async def check_ip(port, timeout=10):
     except (socket.timeout, socket.error):
         return False
 
-result = check_ip(MONITORED_IP, 53131)
+result = check_ip(MONITORED_IP, NODE_PORT)
 print(result)
 
 
@@ -81,13 +82,13 @@ async def check_current_status(message: types.Message = None, force: bool = Fals
 
 
 async def check_ip_status(chat_id):
-    current_status = await check_ip(MONITORED_IP, 53131)
+    current_status = await check_ip(MONITORED_IP, NODE_PORT)
     is_up = bool(current_status)
     status_message = random.choice(response_up) if is_up else random.choice(response_down)
 
     # Log the result of the status check
     status_result = "UP" if is_up else "DOWN"
-    logging.info(f"IP {MONITORED_IP} status: {status_result}")
+    logging.info(f"IP {MONITORED_IP}:{NODE_PORT} status: {status_result}")
 
     # Логуємо повідомлення
     logging.info(f"Sent message to chat {chat_id}: {status_message}")
@@ -99,7 +100,7 @@ async def schedule_ip_status_check():
     previous_status = None
 
     while True:
-        current_status = await check_ip(MONITORED_IP, 53131)
+        current_status = await check_ip(MONITORED_IP, NODE_PORT)
         is_up = bool(current_status)
 
         if previous_status is None or is_up != previous_status:
@@ -122,7 +123,7 @@ async def call_status_command(message: types.Message):
 
 @dp.inline_handler(lambda query: True)
 async def inline_status_query(inline_query: types.InlineQuery):
-    current_status = await check_ip(MONITORED_IP, 53131)
+    current_status = await check_ip(MONITORED_IP, NODE_PORT)
     is_up = bool(current_status)
     status_message = random.choice(response_up) if is_up else random.choice(response_down)
 
