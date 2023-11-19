@@ -59,20 +59,19 @@ async def check_ip(host, port, timeout=10):
         return False
 
 
-
 @dp.message_handler(commands=['status'])
 async def check_current_status(message: types.Message):
-        current_status = await check_ip(MONITORED_IP, 53131)
-        is_up = bool(current_status)
-        status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
+    current_status = await check_ip(MONITORED_IP, 53131)
+    is_up = bool(current_status)
+    status_message = random.sample(response_up, 1)[0] if is_up else random.sample(response_down, 1)[0]
 
-        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        keyboard.add(types.KeyboardButton(text='А щас?'))
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(types.KeyboardButton(text='А щас?'))
 
-        # Логуємо повідомлення
-        logging.info(f"Sent message to chat {message.chat.id}: {status_message}")
-        await bot.send_message(chat_id=message.chat.id, text=status_message, parse_mode=ParseMode.MARKDOWN,
-                               reply_markup=keyboard)
+    # Логуємо повідомлення
+    logging.info(f"Sent message to chat {message.chat.id}: {status_message}")
+    await bot.send_message(chat_id=message.chat.id, text=status_message, parse_mode=ParseMode.MARKDOWN,
+                           reply_markup=keyboard)
 
 
 @dp.message_handler(lambda message: message.text == 'А щас?')
@@ -98,24 +97,7 @@ async def inline_status_query(inline_query: types.InlineQuery):
 if __name__ == '__main__':
     try:
         loop = asyncio.get_event_loop()
-        loop.create_task(monitor_ip())
+        loop.create_task(check_current_status())  # Використовуємо check_current_status замість monitor_ip
         executor.start_polling(dp, loop=loop, skip_updates=True)
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-
-
-if __name__ == '__main__':
-    try:
-        loop = asyncio.get_event_loop()
-
-        # Перевірка та надсилання статусу IP-адреси при запуску
-        initial_status = loop.run_until_complete(check_ip(MONITORED_IP, 53131))
-        initial_message = random.sample(response_up, 1)[0] if initial_status else random.sample(response_down, 1)[0]
-        loop.run_until_complete(bot.send_message(chat_id=YOUR_CHAT_ID, text=str(initial_message), parse_mode=ParseMode.MARKDOWN))
-
-        # Запуск бота
-        loop.create_task(monitor_ip())
-        executor.start_polling(dp, loop=loop, skip_updates=True)
-
     except Exception as e:
         logging.error(f"An error occurred: {e}")
