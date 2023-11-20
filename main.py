@@ -31,6 +31,15 @@ dp = Dispatcher(bot)
 # Set to keep track of sent messages
 sent_messages = {}
 
+
+async def check_ip(port, timeout=10):
+    try:
+        socket.create_connection((MONITORED_IP, port), timeout=timeout)
+        return True
+    except (socket.timeout, socket.error):
+        return False
+
+
 async def check_ip_status_and_save_to_db(chat_id):
     current_status = await check_ip(MONITORED_IP, NODE_PORT)
     is_up = bool(current_status)
@@ -48,6 +57,7 @@ async def check_ip_status_and_save_to_db(chat_id):
     await bot.send_message(chat_id=chat_id, text=status_message, parse_mode=ParseMode.MARKDOWN)
     return status_message
 
+
 async def save_event_to_db(chat_id, is_up):
     # Connect to the database
     connection = await asyncpg.connect(DATABASE_URL)
@@ -62,6 +72,7 @@ async def save_event_to_db(chat_id, is_up):
         # Close the database connection
         await connection.close()
 
+
 async def schedule_ip_status_check():
     previous_status = None
 
@@ -75,6 +86,7 @@ async def schedule_ip_status_check():
             previous_status = is_up
 
         await asyncio.sleep(30)  # Check every 30 seconds
+
 
 # Інші функції залишаються незмінними
 
