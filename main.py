@@ -15,25 +15,25 @@ NODE_PORT = int(os.getenv('NODE_PORT', '53131'))  # Default to 53131 if NODE_POR
 YOUR_CHAT_ID = os.getenv('YOUR_CHAT_ID')
 
 response_down = [
-    "🔴 Наробився 🐧",
-    "🔴 Работа нє волк 🐺",
-    "🔴 Я шо, коняка? 🐎",
-    "🔴 На сьогодні хватить 🧘",
-    "🔴 Хай поки сохне там 💆",
-    "🔴 Сьогодні 40 квадратів не получилось 🤔",
-    "🔴 Свєт вимкнув, воду вимкнув, до завтра 🙋‍♂️",
-    "🔴 Пішов просить сестру, щоб помогла з маляркою 👫",
-    "🔴 Пішов, бо й метро закриється 🌒"
+    "🔴 Наробився 🐧"
+    # "🔴 Работа нє волк 🐺",
+    # "🔴 Я шо, коняка? 🐎",
+    # "🔴 На сьогодні хватить 🧘",
+    # "🔴 Хай поки сохне там 💆",
+    # "🔴 Сьогодні 40 квадратів не получилось 🤔",
+    # "🔴 Свєт вимкнув, воду вимкнув, до завтра 🙋‍♂️",
+    # "🔴 Пішов просить сестру, щоб помогла з маляркою 👫",
+    # "🔴 Пішов, бо й метро закриється 🌒"
 ]
 
 response_up = [
-    "🟩 Добрий день! 🖖",
-    "🟩 Прийшов рано, щоб до 1 вересня кончить 🥹",
-    "🟩 Зайшов взнать, чи вже придумали, що на фартух вішать? 🐼",
-    "🟩 А де всі? 🤔",
-    "🟩 Сьогодні 40 квадратів здєлаю, а може й усі 50 🥸",
-    "🟩 На місці! 👌",
-    "🟩 Сьогодні буду работать до ночі 💪"
+    # "🟩 Добрий день! 🖖",
+    # "🟩 Прийшов рано, щоб до 1 вересня кончить 🥹",
+    # "🟩 Зайшов взнать, чи вже придумали, що на фартух вішать? 🐼",
+    # "🟩 А де всі? 🤔",
+    # "🟩 Сьогодні 40 квадратів здєлаю, а може й усі 50 🥸",
+    "🟩 На місці! 👌"
+    #"🟩 Сьогодні буду работать до ночі 💪"
 ]
 
 logging.basicConfig(level=logging.DEBUG)
@@ -72,14 +72,9 @@ async def check_ip(host, port, timeout=10):
 async def check_current_status(message: types.Message = None, force: bool = False):
     chat_id = message.chat.id if message and message.chat else YOUR_CHAT_ID
 
-    # If force is False and the message has already been sent, return
-    if not force and chat_id in sent_messages:
-        return
-
-    #await bot.send_message(chat_id=chat_id, text="🤖 Бот запускається...", parse_mode=ParseMode.MARKDOWN)
+    # Always send the message, regardless of the value of force
     status_message = await check_ip_status(chat_id)
     sent_messages[chat_id] = status_message  # Update the previous status
-
 
 async def check_ip_status(chat_id):
     current_status = await check_ip(MONITORED_IP, NODE_PORT)
