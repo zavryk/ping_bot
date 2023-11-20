@@ -74,7 +74,7 @@ async def check_current_status(message: types.Message = None, force: bool = Fals
 
     # Always send the message, regardless of the value of force
     status_message = await check_ip_status(chat_id)
-    sent_messages[chat_id] = status_message  # Update the previous status
+    sent_messages[chat_id] = status_message  # Update previous status
 
 async def check_ip_status(chat_id):
     current_status = await check_ip(MONITORED_IP, NODE_PORT)
