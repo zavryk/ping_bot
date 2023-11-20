@@ -76,7 +76,7 @@ async def check_current_status(message: types.Message = None, force: bool = Fals
     if not force and chat_id in sent_messages:
         return
 
-    await bot.send_message(chat_id=chat_id, text="🤖 Бот запускається...", parse_mode=ParseMode.MARKDOWN)
+    #await bot.send_message(chat_id=chat_id, text="🤖 Бот запускається...", parse_mode=ParseMode.MARKDOWN)
     status_message = await check_ip_status(chat_id)
     sent_messages[chat_id] = status_message  # Update the previous status
 
